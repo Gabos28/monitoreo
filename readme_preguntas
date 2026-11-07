@@ -1,0 +1,26 @@
+1 ¿Por qué la temperatura suele aparecer como “No disponible” en Windows? Prueben abrir la terminal
+como administrador y comparen.
+2 ¿Por qué el script de PowerShell nunca debe incluir datos que vengan del usuario?
+3 ¿Qué riesgo tiene dejar /api/metrics sin autenticación en un servidor real?
+4 Con polling cada 5 segundos, ¿cuántos pedidos por minuto recibe el servidor si hay 50 personas
+mirando?
+5 Si una app solo necesita la temperatura, ¿qué datos recibe de más al llamar a /api/metrics ?
+
+1) Pestaña Red: con polling aparecen solicitudes HTTP repetidas a /api/metrics —una por cada intervalo—. Con Reverb se mantiene una conexión WebSocket 
+y el servidor envía eventos cuando hay datos nuevos; no hace falta consultar la API continuamente. Podría seguir habiendo una petición inicial para cargar la página.
+
+2) Si detienes los procesos:
+reverb:start: dejan de llegar actualizaciones en tiempo real. La página puede conservar los últimos datos que recibió.
+schedule:work: dejan de ejecutarse las tareas programadas que toman o publican datos; Reverb puede seguir conectado, pero no habrá nuevos valores.
+El resultado exacto depende de cómo esté configurado el evento y el programador del TP.
+
+3) PowerShell y cantidad de personas: en el esquema con tarea programada, PowerShell se ejecuta en 
+cada ciclo del servidor y el resultado se difunde a todos los espectadores; por eso el número de usuarios no multiplica esas 
+ejecuciones. En cambio, la versión actual de este proyecto todavía usa polling: cada consulta a /api/metrics vuelve a obtener una captura, 
+que ejecuta PowerShell en Windows. Con muchos espectadores aumentan las llamadas y también las ejecuciones de PowerShell. Esto se ve en servidor.blade.php y ServerMetrics.php.
+
+4) Lista blanca en DemoController: limita las opciones a programas permitidos. No confiar en un nombre enviado 
+por el navegador evita que alguien intente ejecutar comandos o programas arbitrarios en el servidor.
+
+5) ShouldBroadcast vs. ShouldBroadcastNow: ShouldBroadcast despacha el evento a la cola; por eso requiere un worker de colas funcionando. ShouldBroadcastNow lo transmite inmediatamente en el proceso actual, sin esperar la cola.
+Gráficos y componente: si la vista recibe los mismos datos con el mismo formato, el componente puede actualizar el gráfico sin saber si esos datos llegaron por polling o por WebSocket. El componente encapsula la presentación y permite reutilizarla sin acoplarla al mecanismo de actualización.
