@@ -1,0 +1,21 @@
+Descripcion de las imagenes
+==========================
+
+MonitorLogin.PNG
+Vista principal del monitor del servidor. Muestra hostname, sistema operativo,
+version de PHP y metricas de disco, memoria, CPU y tiempo encendido.
+
+MonitorListFallos.PNG
+Seccion del monitor que muestra los ultimos intentos de inicio de sesion
+fallidos o bloqueados, junto con fecha, direccion IP y resultado.
+
+MonitorLogin.PNG
+Formulario de inicio de sesion de la aplicacion, con campos de correo,
+contraseña y opcion para recordar la sesion.
+
+MonitorApi.png
+Respuesta JSON del endpoint GET /api/metrics. Incluye las metricas del servidor
+y la lista de los ultimos intentos de inicio de sesion.
+
+Las metricas y fechas visibles son una captura del momento en que se tomo cada
+imagen y pueden cambiar al volver a consultar el sistema.
